@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#751f2b">
+  <title>GARAGE 36 | Estacionamiento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-art">
+      <div class="sign"><span>GARAGE</span><b>36</b></div>
+      <p class="eyebrow">ESTACIONAMIENTO · DESDE 1956</p>
+      <h1>Un lugar<br>para cada viaje.</h1>
+      <p class="login-note">Administración de estacionamiento</p>
+      <div class="car-illustration" aria-hidden="true">🚘</div>
+    </div>
+    <form id="loginForm" class="login-card">
+      <p class="eyebrow">BIENVENIDO DE NUEVO</p>
+      <h2>Iniciar sesión</h2>
+      <label>Usuario<input id="loginUser" autocomplete="username" value="admin" required></label>
+      <label>Contraseña<input id="loginPass" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required></label>
+      <button class="btn primary full" type="submit">Entrar al sistema <span>→</span></button>
+      <p class="login-hint">Acceso de demostración: <b>admin</b> / <b>2026</b></p>
+      <p id="loginError" class="error-text"></p>
+    </form>
+  </div>
+
+  <div id="app" class="app-shell hidden">
+    <aside class="sidebar">
+      <a class="brand" href="#"><span class="brand-mark">G36</span><span><b>GARAGE 36</b><small>ESTACIONAMIENTO</small></span></a>
+      <div class="side-label">MENÚ PRINCIPAL</div>
+      <nav id="mainNav">
+        <button class="nav-link active" data-page="dashboard"><span>▦</span> Resumen</button>
+        <button class="nav-link" data-page="parking"><span>▤</span> Estacionamiento</button>
+        <button class="nav-link" data-page="clients"><span>♙</span> Clientes</button>
+        <button class="nav-link" data-page="vehicles"><span>▱</span> Vehículos</button>
+        <button class="nav-link" data-page="payments"><span>Ｑ</span> Pagos e historial</button>
+        <button class="nav-link" data-page="rates"><span>◷</span> Tarifas</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="open-status"><i></i><span><b>Estacionamiento abierto</b><small>Operación de demostración</small></span></div>
+        <button id="resetData" class="text-button">↻ Restaurar datos de ejemplo</button>
+        <button id="logoutBtn" class="logout">↪ Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div><p class="eyebrow" id="dateLabel">GARAGE 36 / ADMINISTRACIÓN</p><h1 id="pageTitle">Resumen general</h1></div>
+        <div class="top-actions"><span class="today-chip" id="todayChip"></span><div class="avatar">A</div><div class="user-label"><b>Administrador</b><small>Cuenta de demostración</small></div></div>
+      </header>
+      <div class="content">
+        <section id="dashboardPage" class="page">
+          <div class="welcome-banner"><div><p class="eyebrow light">PANEL DE CONTROL · GARAGE 36</p><h2>Todo en su lugar.<br><em>Tu operación bajo control.</em></h2><p>Administra espacios, clientes y movimientos desde un solo lugar.</p></div><div class="banner-stamp">G<br><b>36</b></div></div>
+          <div class="stats-grid" id="statsGrid"></div>
+          <div class="dashboard-grid">
+            <article class="panel wide"><div class="panel-heading"><div><p class="eyebrow">VISTA EN TIEMPO REAL</p><h3>Estado de los espacios</h3></div><button class="text-button" data-go="parking">Ver estacionamiento →</button></div><div id="miniParking" class="mini-parking"></div><div class="legend"><span><i class="dot free"></i> Disponible</span><span><i class="dot busy"></i> Ocupado</span></div></article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">ACTIVIDAD RECIENTE</p><h3>Últimos movimientos</h3></div></div><div id="recentActivity" class="activity-list"></div></article>
+          </div>
+        </section>
+
+        <section id="parkingPage" class="page hidden">
+          <div class="section-intro"><div><p class="eyebrow">CONTROL DE ESPACIOS</p><h2>Estacionamiento</h2><p>Selecciona un espacio disponible para registrar una entrada.</p></div><button class="btn primary" id="newEntryBtn">＋ Registrar entrada</button></div>
+          <div class="parking-summary" id="parkingSummary"></div>
+          <div class="panel"><div class="panel-heading"><div><p class="eyebrow">DISTRIBUCIÓN</p><h3>Mapa de espacios</h3></div><div class="legend"><span><i class="dot free"></i> Disponible</span><span><i class="dot busy"></i> Ocupado</span></div></div><div id="parkingGrid" class="parking-grid"></div></div>
+          <div class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">VEHÍCULOS PRESENTES</p><h3>Estancias activas</h3></div></div><div class="table-wrap"><table><thead><tr><th>Placa</th><th>Cliente</th><th>Espacio</th><th>Entrada</th><th>Tiempo</th><th>Acción</th></tr></thead><tbody id="activeStays"></tbody></table></div></div>
+        </section>
+
+        <section id="clientsPage" class="page hidden">
+          <div class="section-intro"><div><p class="eyebrow">DIRECTORIO</p><h2>Clientes</h2><p>Administra la información de los clientes registrados.</p></div><button class="btn primary" id="addClientBtn">＋ Nuevo cliente</button></div>
+          <div class="toolbar"><input id="clientSearch" class="search" placeholder="Buscar por nombre, teléfono o correo..."><span id="clientCount" class="muted"></span></div>
+          <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Teléfono</th><th>Correo</th><th>Vehículos</th><th>Acciones</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div>
+        </section>
+
+        <section id="vehiclesPage" class="page hidden">
+          <div class="section-intro"><div><p class="eyebrow">REGISTRO DE TRANSPORTE</p><h2>Vehículos</h2><p>Consulta y administra los vehículos de cada cliente.</p></div><button class="btn primary" id="addVehicleBtn">＋ Nuevo vehículo</button></div>
+          <div class="toolbar"><input id="vehicleSearch" class="search" placeholder="Buscar placa, marca o propietario..."></div>
+          <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Placa</th><th>Vehículo</th><th>Tipo</th><th>Propietario</th><th>Acciones</th></tr></thead><tbody id="vehiclesTable"></tbody></table></div></div>
+        </section>
+
+        <section id="paymentsPage" class="page hidden">
+          <div class="section-intro"><div><p class="eyebrow">REGISTRO FINANCIERO</p><h2>Pagos e historial</h2><p>Consulta los cobros realizados y sus comprobantes.</p></div><div class="total-pill" id="totalCollected"></div></div>
+          <div class="toolbar"><input id="paymentSearch" class="search" placeholder="Buscar por placa, cliente o comprobante..."><select id="paymentFilter"><option value="all">Todos los pagos</option><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option></select></div>
+          <div class="panel table-panel"><div class="table-wrap"><table><thead><tr><th>Comprobante</th><th>Fecha</th><th>Cliente</th><th>Placa</th><th>Horas</th><th>Método</th><th>Total</th><th></th></tr></thead><tbody id="paymentsTable"></tbody></table></div></div>
+        </section>
+
+        <section id="ratesPage" class="page hidden">
+          <div class="section-intro"><div><p class="eyebrow">CONFIGURACIÓN</p><h2>Tarifas</h2><p>Define el precio por hora según el tipo de vehículo.</p></div><button class="btn primary" id="saveRatesBtn">Guardar tarifas</button></div>
+          <div class="rates-grid" id="ratesGrid"></div>
+          <div class="note-box">✳ <span>El cobro se calcula por hora iniciada. La primera hora siempre se cobra completa.</span></div>
+        </section>
+      </div>
+      <footer class="footer"><span>GARAGE 36 © 2026</span><span>HECHO PARA CADA VIAJE · GUATEMALA</span></footer>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden"><div class="modal-backdrop" data-close></div><div class="modal-card"><div class="modal-head"><div><p class="eyebrow" id="modalEyebrow">GARAGE 36</p><h2 id="modalTitle"></h2></div><button class="close-btn" data-close>×</button></div><div id="modalBody"></div></div></div>
+  <div id="toast" class="toast"></div>
+  <script src="js/app.js"></script>
+</body>
+</html>
