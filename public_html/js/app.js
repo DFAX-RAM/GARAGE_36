@@ -106,12 +106,38 @@ function closeStay(id){
 }
 function openReceipt(id){
  const p=data.payments.find(x=>x.id===id);if(!p)return;
- openModal("Comprobante de pago",`<div id="receiptContent" class="receipt"><h2>GARAGE 36</h2><p>COMPROBANTE DE ESTACIONAMIENTO<br>Guatemala, Guatemala</p><hr><div class="receipt-line"><span>Comprobante</span><b>${p.receipt}</b></div><div class="receipt-line"><span>Fecha</span><b>${dateTime(p.date)}</b></div><hr><div class="receipt-line"><span>Cliente</span><b>${esc(p.client)}</b></div><div class="receipt-line"><span>Vehículo</span><b>${esc(p.brand)}</b></div><div class="receipt-line"><span>Placa</span><b>${esc(p.plate)}</b></div><div class="receipt-line"><span>Espacio</span><b>${p.space}</b></div><div class="receipt-line"><span>Tiempo</span><b>${p.hours} hora(s)</b></div><div class="receipt-line"><span>Tarifa por hora</span><b>${money(p.rate)}</b></div><div class="receipt-line"><span>Método de pago</span><b>${p.method}</b></div><hr><div class="receipt-line receipt-total"><span>TOTAL</span><b>${money(p.total)}</b></div><hr><p>Gracias por confiar en GARAGE 36.<br>¡Buen viaje!</p><small>Documento de demostración; no es factura fiscal.</small></div><button class="btn primary print-btn" id="printReceipt">Imprimir comprobante</button>`);
+ openModal("Comprobante de pago",`<div id="receiptContent" class="receipt"><h2>GARAGE 36</h2><p>COMPROBANTE DE ESTACIONAMIENTO<br>Guatemala, Guatemala</p><hr><div class="receipt-line"><span>Comprobante</span><b>${p.receipt}</b></div><div class="receipt-line"><span>Fecha</span><b>${dateTime(p.date)}</b></div><hr><div class="receipt-line"><span>Cliente</span><b>${esc(p.client)}</b></div><div class="receipt-line"><span>Vehículo</span><b>${esc(p.brand)}</b></div><div class="receipt-line"><span>Placa</span><b>${esc(p.plate)}</b></div><div class="receipt-line"><span>Espacio</span><b>${p.space}</b></div><div class="receipt-line"><span>Tiempo</span><b>${p.hours} hora(s)</b></div><div class="receipt-line"><span>Tarifa por hora</span><b>${money(p.rate)}</b></div><div class="receipt-line"><span>Método de pago</span><b>${p.method}</b></div><hr><div class="receipt-line receipt-total"><span>TOTAL</span><b>${money(p.total)}</b></div><hr><p>Gracias por confiar en GARAGE 36.<br>¡Buen viaje!</p></div><button class="btn primary print-btn" id="printReceipt">Imprimir comprobante</button>`);
  $("printReceipt").onclick=()=>{const content=$("receiptContent").innerHTML,w=window.open("","_blank","width=500,height=700");w.document.write(`<html><head><title>${p.receipt}</title><style>body{font-family:Arial;padding:25px}.receipt{max-width:400px;margin:auto}.receipt h2{text-align:center;color:#751f2b}.receipt p{text-align:center;line-height:1.5}.receipt hr{border:0;border-top:1px dashed #999;margin:18px 0}.receipt-line{display:flex;justify-content:space-between;padding:7px 0;font-size:13px}.receipt-total{font-size:20px;font-weight:bold}small{font-size:10px}</style></head><body><div class="receipt">${content}</div><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close();};
 }
+
+function renderPublic(){
+ const active=data.stays.filter(s=>s.status==="ACTIVE").length;
+ $("publicFreeCount").textContent=40-active;
+ $("publicSpaceSummary").innerHTML=spaces().map(s=>{const busy=!!activeForSpace(s.id);return `<div class="public-slot ${busy?"busy":"free"}"><b>${s.id}</b><small>${busy?"OCUPADO":"DISPONIBLE"}</small></div>`;}).join("");
+ $("publicRatesGrid").innerHTML=[
+  ["AUTO","🚗","Automóvil"],["MOTO","🏍️","Motocicleta"],["CAMIONETA","🚙","Camioneta"]
+ ].map(([key,icon,label])=>`<article class="public-rate-card"><div class="public-rate-icon">${icon}</div><h3>${label}</h3><p>Por hora iniciada</p><strong>${money(data.rates[key])}</strong><small>QUETZALES / HORA</small></article>`).join("");
+}
+function openPublicPayment(){
+ const free=spaces().filter(s=>!activeForSpace(s.id));
+ openModal("Realizar pago","<form id='publicPaymentForm'><div class='form-grid'><label>Nombre completo<input name='client' required placeholder='Escribe tu nombre'></label><label>Placa del vehículo<input name='plate' required placeholder='P-123ABC'></label><label>Marca y modelo<input name='brand' required placeholder='Toyota Corolla'></label><label>Tipo de vehículo<select name='type'><option value='AUTO'>Automóvil</option><option value='MOTO'>Motocicleta</option><option value='CAMIONETA'>Camioneta</option></select></label><label>Horas a pagar<input name='hours' type='number' min='1' max='24' value='1' required></label><label>Método de pago<select name='method'><option value='TARJETA'>Tarjeta</option><option value='TRANSFERENCIA'>Transferencia</option><option value='EFECTIVO'>Efectivo</option></select></label></div><div class='public-payment-total'><span>Total a pagar</span><strong id='publicPaymentTotal'>Q 10.00</strong></div><div class='form-actions'><button type='button' class='btn secondary' data-close>Cancelar</button><button class='btn primary' type='submit'>Confirmar pago</button></div></form>","GARAGE 36 / PAGOS");
+ const form=$("publicPaymentForm");
+ const updateTotal=()=>{const fd=new FormData(form),type=fd.get("type"),hours=Math.max(1,Number(fd.get("hours"))||1);$("publicPaymentTotal").textContent=money((data.rates[type]||10)*hours);};
+ form.addEventListener("input",updateTotal);form.addEventListener("change",updateTotal);updateTotal();
+ form.onsubmit=e=>{
+  e.preventDefault();const f=new FormData(form),hours=Math.max(1,Math.min(24,Number(f.get("hours"))||1)),type=f.get("type"),rate=data.rates[type]||10,now=Date.now();
+  const receipt=`G36-${String(data.receiptNo++).padStart(6,"0")}`;
+  const p={id:Date.now(),stayId:null,receipt,date:now,client:f.get("client").trim(),plate:f.get("plate").trim().toUpperCase(),brand:f.get("brand").trim(),space:"PAGO DE CLIENTE",start:now,end:now,hours,rate,total:hours*rate,method:f.get("method")};
+  data.payments.push(p);saveData();closeModal();renderPublic();showToast("Pago realizado correctamente.");openReceipt(p.id);
+ };
+}
+
 function bindEvents(){
- $("loginForm").onsubmit=e=>{e.preventDefault();if($("loginUser").value.trim()==="admin"&&$("loginPass").value==="2026"){$("loginScreen").classList.add("hidden");$("app").classList.remove("hidden");sessionStorage.setItem("garage36_login","1");renderDashboard();}else $("loginError").textContent="Usuario o contraseña incorrectos.";};
- $("logoutBtn").onclick=()=>{sessionStorage.removeItem("garage36_login");$("app").classList.add("hidden");$("loginScreen").classList.remove("hidden");$("loginPass").value="";};
+ $("loginForm").onsubmit=e=>{e.preventDefault();if($("loginUser").value.trim()==="admin"&&$("loginPass").value==="2026"){$("publicScreen").classList.add("hidden");$("loginScreen").classList.add("hidden");$("app").classList.remove("hidden");sessionStorage.setItem("garage36_login","1");renderDashboard();}else $("loginError").textContent="Usuario o contraseña incorrectos.";};
+ $("openAdminBtn").onclick=()=>{$("publicScreen").classList.add("hidden");$("loginScreen").classList.remove("hidden");};
+ $("backPublicBtn").onclick=()=>{$("loginScreen").classList.add("hidden");$("publicScreen").classList.remove("hidden");$("loginError").textContent="";};
+ $("publicPayBtn").onclick=openPublicPayment;
+ $("logoutBtn").onclick=()=>{sessionStorage.removeItem("garage36_login");$("app").classList.add("hidden");$("loginScreen").classList.add("hidden");$("publicScreen").classList.remove("hidden");renderPublic();$("loginPass").value="";};
  $("mainNav").onclick=e=>{const b=e.target.closest("[data-page]");if(b)setPage(b.dataset.page);};
  document.body.addEventListener("click",e=>{const go=e.target.closest("[data-go]");if(go)setPage(go.dataset.go);const close=e.target.closest("[data-close]");if(close)closeModal();const exit=e.target.closest("[data-exit]");if(exit)closeStay(Number(exit.dataset.exit));const slot=e.target.closest("[data-space]");if(slot)openEntryForm(slot.dataset.space);
   const ec=e.target.closest("[data-edit-client]");if(ec)openClientForm(Number(ec.dataset.editClient));
@@ -123,11 +149,11 @@ function bindEvents(){
  $("addClientBtn").onclick=()=>openClientForm();$("addVehicleBtn").onclick=()=>openVehicleForm();$("newEntryBtn").onclick=()=>openEntryForm();
  $("clientSearch").oninput=renderClients;$("vehicleSearch").oninput=renderVehicles;$("paymentSearch").oninput=renderPayments;$("paymentFilter").onchange=renderPayments;
  $("saveRatesBtn").onclick=()=>{["AUTO","MOTO","CAMIONETA"].forEach(k=>{const n=Number($("rate-"+k).value);if(n>0)data.rates[k]=n;});saveData();showToast("Tarifas actualizadas.");};
- $("resetData").onclick=()=>{if(confirm("Esto restaurará los datos de demostración y eliminará los cambios guardados. ¿Continuar?")){data=seedData();saveData();setPage("dashboard");showToast("Datos de ejemplo restaurados.");}};
+ $("resetData").onclick=()=>{if(confirm("Esto restaurará los datos de ejemplo y eliminará los cambios guardados. ¿Continuar?")){data=seedData();saveData();setPage("dashboard");showToast("Datos de ejemplo restaurados.");}};
 }
 function init(){
- loadData();bindEvents();$("todayChip").textContent=new Date().toLocaleDateString("es-GT",{weekday:"short",day:"2-digit",month:"short",year:"numeric"}).toUpperCase();
- if(sessionStorage.getItem("garage36_login")==="1"){$("loginScreen").classList.add("hidden");$("app").classList.remove("hidden");}
+ loadData();bindEvents();renderPublic();$("todayChip").textContent=new Date().toLocaleDateString("es-GT",{weekday:"short",day:"2-digit",month:"short",year:"numeric"}).toUpperCase();
+ if(sessionStorage.getItem("garage36_login")==="1"){$("publicScreen").classList.add("hidden");$("loginScreen").classList.add("hidden");$("app").classList.remove("hidden");}else{$("publicScreen").classList.remove("hidden");$("loginScreen").classList.add("hidden");$("app").classList.add("hidden");}
  renderDashboard();
 }
 init();

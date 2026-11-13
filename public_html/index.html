@@ -11,6 +11,43 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+
+  <div id="publicScreen" class="public-screen">
+    <header class="public-header">
+      <a class="brand public-brand" href="#"><span class="brand-mark">G36</span><span><b>GARAGE 36</b><small>ESTACIONAMIENTO</small></span></a>
+      <nav class="public-nav"><a href="#publicSpaces">Espacios</a><a href="#publicRates">Tarifas</a><a href="#publicAbout">Nosotros</a></nav>
+      <button class="btn primary" id="openAdminBtn">Acceso administrador</button>
+    </header>
+    <main>
+      <section class="public-hero">
+        <div class="public-hero-copy">
+          <p class="eyebrow">GARAGE 36 · ESTACIONAMIENTO</p>
+          <h1>Tu espacio.<br><em>Tu tranquilidad.</em></h1>
+          <p>Estaciona con comodidad y consulta nuestros espacios y tarifas antes de llegar.</p>
+          <div class="public-hero-actions"><a class="btn primary" href="#publicSpaces">Consultar espacios <span>→</span></a><a class="public-text-link" href="#publicRates">Ver tarifas</a></div>
+        </div>
+        <div class="public-hero-art"><div class="public-roundel">G<br><b>36</b></div><div class="public-car">🚘</div><span>ESTACIONA · DISFRUTA · CONTINÚA</span></div>
+      </section>
+      <section class="public-section" id="publicSpaces">
+        <div class="public-section-heading"><div><p class="eyebrow">DISPONIBILIDAD</p><h2>Encuentra tu espacio</h2><p>Consulta los espacios que se encuentran libres en este momento.</p></div><div class="availability-number"><b id="publicFreeCount">37</b><span>ESPACIOS DISPONIBLES</span></div></div>
+        <div class="public-space-summary" id="publicSpaceSummary"></div>
+        <div class="public-legend"><span><i class="dot free"></i> Disponible</span><span><i class="dot busy"></i> Ocupado</span></div>
+      </section>
+      <section class="public-section rates-section" id="publicRates">
+        <div class="public-section-heading"><div><p class="eyebrow">NUESTRAS TARIFAS</p><h2>Precios claros</h2><p>Selecciona el tipo de vehículo para consultar su tarifa por hora.</p></div></div>
+        <div class="public-rate-cards" id="publicRatesGrid"></div>
+      </section>
+      <section class="public-payment-banner">
+        <div><p class="eyebrow light">PAGO RÁPIDO</p><h2>¿Listo para pagar?</h2><p>Realiza tu pago y obtén tu comprobante en unos pasos.</p></div>
+        <button class="btn public-pay-btn" id="publicPayBtn">Pagar ahora <span>→</span></button>
+      </section>
+      <section class="public-section about-section" id="publicAbout">
+        <p class="eyebrow">GARAGE 36</p><h2>Un lugar para cada viaje.</h2><p>Estamos para hacer más sencillo tu día. Consulta la disponibilidad, revisa las tarifas y continúa tu camino con tranquilidad.</p>
+      </section>
+    </main>
+    <footer class="public-footer"><span>GARAGE 36 © 2026</span><span>HECHO PARA CADA VIAJE · GUATEMALA</span></footer>
+  </div>
+
   <div id="loginScreen" class="login-screen">
     <div class="login-art">
       <div class="sign"><span>GARAGE</span><b>36</b></div>
@@ -25,8 +62,8 @@
       <label>Usuario<input id="loginUser" autocomplete="username" value="admin" required></label>
       <label>Contraseña<input id="loginPass" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required></label>
       <button class="btn primary full" type="submit">Entrar al sistema <span>→</span></button>
-      <p class="login-hint">Acceso de demostración: <b>admin</b> / <b>2026</b></p>
-      <p id="loginError" class="error-text"></p>
+      <p class="login-hint">Usuario: <b>admin</b> · Contraseña: <b>2026</b></p>
+      <p id="loginError" class="error-text"></p><button type="button" class="public-text-link login-back" id="backPublicBtn">← Volver al sitio</button>
     </form>
   </div>
 
@@ -43,7 +80,7 @@
         <button class="nav-link" data-page="rates"><span>◷</span> Tarifas</button>
       </nav>
       <div class="sidebar-bottom">
-        <div class="open-status"><i></i><span><b>Estacionamiento abierto</b><small>Operación de demostración</small></span></div>
+        <div class="open-status"><i></i><span><b>Estacionamiento abierto</b><small>Atención y servicio</small></span></div>
         <button id="resetData" class="text-button">↻ Restaurar datos de ejemplo</button>
         <button id="logoutBtn" class="logout">↪ Cerrar sesión</button>
       </div>
@@ -52,7 +89,7 @@
     <main class="main-area">
       <header class="topbar">
         <div><p class="eyebrow" id="dateLabel">GARAGE 36 / ADMINISTRACIÓN</p><h1 id="pageTitle">Resumen general</h1></div>
-        <div class="top-actions"><span class="today-chip" id="todayChip"></span><div class="avatar">A</div><div class="user-label"><b>Administrador</b><small>Cuenta de demostración</small></div></div>
+        <div class="top-actions"><span class="today-chip" id="todayChip"></span><div class="avatar">A</div><div class="user-label"><b>Administrador</b><small>Administrador</small></div></div>
       </header>
       <div class="content">
         <section id="dashboardPage" class="page">
